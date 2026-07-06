@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EthioluckyV2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login" class="center">
+  <div class="card">
+    <h2>🎡 EthioluckyV2</h2>
+
+    <input id="role" placeholder="admin or host">
+    <input id="password" type="password" placeholder="password">
+
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none;">
+
+  <div class="topbar">
+    <h2>🎡 Live Wheel</h2>
+    <p>👁 Viewers: <span id="viewers">0</span></p>
+  </div>
+
+  <div class="wheel-container">
+    <canvas id="wheel" width="400" height="400"></canvas>
+  </div>
+
+  <div class="controls">
+    <button onclick="spin()">SPIN</button>
+  </div>
+
+  <h1 id="winner"></h1>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="wheel.js"></script>
+
+</body>
+</html>

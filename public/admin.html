@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - EthioluckyV2</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin">
+
+  <h1>⚙ Admin Dashboard</h1>
+
+  <div class="card">
+    <h3>Add Player</h3>
+
+    <input id="name" placeholder="Player name">
+    <input id="color" placeholder="Color (#ff0000)">
+
+    <button onclick="addPlayer()">Add</button>
+  </div>
+
+  <div class="card">
+    <h3>Controls</h3>
+
+    <button onclick="sendUpdate()">Update Wheel</button>
+    <button onclick="startSpin()">Start Spin</button>
+  </div>
+
+  <div class="card">
+    <h3>Players</h3>
+    <div id="list"></div>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="admin.js"></script>
+
+</body>
+</html>

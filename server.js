@@ -1,113 +1,51 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const fs = require("fs");
 const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// ========================
-// PATHS
-// ========================
-const DATA_DIR = path.join(__dirname, "data");
-const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
-
-// ========================
-// CREATE DATA FOLDER IF MISSING
-// ========================
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR);
-}
-
-// ========================
-// DEFAULT STATE
-// ========================
-const defaultState = {
-  viewers: 0,
-  spinning: false,
-  winner: null,
-  segments: [
-    { name: "A", color: "#c68642" },
-    { name: "B", color: "#a47148" },
-    { name: "C", color: "#8b5a2b" },
-    { name: "D", color: "#d2a679" }
-  ]
-};
-
-// ========================
-// CREATE SETTINGS FILE IF MISSING
-// ========================
-if (!fs.existsSync(SETTINGS_FILE)) {
-  fs.writeFileSync(
-    SETTINGS_FILE,
-    JSON.stringify(defaultState, null, 2)
-  );
-}
-
-// ========================
-// LOAD STATE
-// ========================
-let state = JSON.parse(
-  fs.readFileSync(SETTINGS_FILE, "utf-8")
-);
-
-// ========================
-// SAVE FUNCTION
-// ========================
-function saveState() {
-  fs.writeFileSync(
-    SETTINGS_FILE,
-    JSON.stringify(state, null, 2)
-  );
-}
-
-// ========================
-// MIDDLEWARE
-// ========================
+app.use(express.json());
 app.use(express.static("public"));
 
-// ========================
-// SOCKET CONNECTION
-// ========================
-io.on("connection", (socket) => {
-  state.viewers++;
-  io.emit("state", state);
-  saveState();
+// 🔐 SIMPLE LOGIN CREDENTIALS (change later if you want)
+const USERS = {
+  admin: { password: "admin123", role: "admin" },
+  host: { password: "host123", role: "host" }
+};
 
-  // update segments from admin
-  socket.on("update-segments", (newSegments) => {
-    state.segments = newSegments;
-    io.emit("state", state);
-    saveState();
-  });
+// LOGIN API
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
 
-  // spin update (optional)
-  socket.on("spin", (data) => {
-    state.spinning = true;
-    io.emit("spin", data);
-  });
+  const user = USERS[username];
 
-  socket.on("stop-spin", (winner) => {
-    state.spinning = false;
-    state.winner = winner;
-    io.emit("state", state);
-    saveState();
-  });
+  if (!user || user.password !== password) {
+    return res.status(401).json({ success: false, message: "Invalid login" });
+  }
 
-  socket.on("disconnect", () => {
-    state.viewers--;
-    io.emit("state", state);
-    saveState();
+  res.json({
+    success: true,
+    role: user.role
   });
 });
 
-// ========================
-// START SERVER
-// ========================
-const PORT = process.env.PORT || 3000;
+// SOCKET.IO
+io.on("connection", (socket) => {
+  console.log("User connected");
 
+  socket.on("spinWheel", (data) => {
+    io.emit("spinWheel", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`🚀 EthioluckyV2 running on port ${PORT}`);
+  console.log("Server running on port", PORT);
 });

@@ -1,15 +1,13 @@
 {
   "name": "ethioluckyv2",
   "version": "2.0.0",
-  "description": "Ethiolucky Wheel V2",
-  "private": true,
+  "description": "Live multiplayer wheel casino app",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
   }
 }

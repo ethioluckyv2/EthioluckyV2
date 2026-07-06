@@ -1,54 +1,51 @@
-const socket = io();
+async function login(){
 
-let players = [];
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-// ---------------- ADD PLAYER ----------------
-function addPlayer() {
-  const name = document.getElementById("name").value;
-  const color = document.getElementById("color").value;
 
-  if (!name || !color) return;
+    console.log("Login attempt:", username);
 
-  players.push({
-    id: Date.now(),
-    name,
-    color
-  });
 
-  render();
-}
+    const response = await fetch("/login", {
 
-// ---------------- REMOVE PLAYER ----------------
-function removePlayer(id) {
-  players = players.filter(p => p.id !== id);
-  render();
-}
+        method:"POST",
 
-// ---------------- RENDER LIST ----------------
-function render() {
-  const list = document.getElementById("list");
-  list.innerHTML = "";
+        headers:{
+            "Content-Type":"application/json"
+        },
 
-  players.forEach(p => {
-    const div = document.createElement("div");
+        body:JSON.stringify({
+            username,
+            password
+        })
 
-    div.innerHTML = `
-      <span style="color:${p.color}">
-        ${p.name}
-      </span>
-      <button onclick="removePlayer(${p.id})">X</button>
-    `;
+    });
 
-    list.appendChild(div);
-  });
-}
 
-// ---------------- SEND TO SERVER ----------------
-function sendUpdate() {
-  socket.emit("update-players", players);
-}
+    const data = await response.json();
 
-// ---------------- START SPIN ----------------
-function startSpin() {
-  socket.emit("spin");
+
+    console.log(data);
+
+
+    if(data.success){
+
+        alert("Welcome " + data.role);
+
+
+        if(data.role === "admin"){
+            window.location.href="/admin.html";
+        }
+
+        if(data.role === "host"){
+            window.location.href="/";
+        }
+
+    }else{
+
+        alert("Wrong username or password");
+
+    }
+
 }

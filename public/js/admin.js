@@ -3,15 +3,19 @@ const socket = io();
 let players = [];
 
 let settings = {
+
     spinDuration: 60,
     minSpeed: 8,
     maxSpeed: 25,
     bgColor: "#ffffff"
+
 };
 
 
+
+
 // ==========================
-// CONNECT
+// CONNECTION
 // ==========================
 
 socket.on("connect", ()=>{
@@ -26,11 +30,27 @@ socket.on("connect", ()=>{
 
 
 
+
+socket.on("disconnect", ()=>{
+
+    console.log(
+        "Admin disconnected"
+    );
+
+});
+
+
+
+
+
 // ==========================
 // RECEIVE PLAYERS
 // ==========================
 
-socket.on("updatePlayers",(data)=>{
+socket.on(
+"updatePlayers",
+(data)=>{
+
 
     console.log(
         "Players received:",
@@ -40,9 +60,13 @@ socket.on("updatePlayers",(data)=>{
 
     players = data;
 
+
     renderPlayers();
 
+
 });
+
+
 
 
 
@@ -56,17 +80,26 @@ function addPlayer(){
 
 
     const name =
-    document.getElementById("playerName").value;
+    document.getElementById(
+        "playerName"
+    ).value.trim();
+
 
 
     const color =
-    document.getElementById("playerColor").value;
+    document.getElementById(
+        "playerColor"
+    ).value;
 
 
 
-    if(name.trim()===""){
+    if(name === ""){
 
-        alert("Enter player name");
+
+        alert(
+            "Enter player name"
+        );
+
 
         return;
 
@@ -74,19 +107,29 @@ function addPlayer(){
 
 
 
+
+
     const player = {
 
-        id: Date.now(),
+
+        id:Date.now(),
+
 
         name:name,
 
+
         color:color
+
 
     };
 
 
 
+
+
     players.push(player);
+
+
 
 
 
@@ -97,9 +140,12 @@ function addPlayer(){
 
 
 
+
+
     document.getElementById(
         "playerName"
     ).value="";
+
 
 
 }
@@ -110,23 +156,35 @@ function addPlayer(){
 
 
 
+
 // ==========================
-// SHOW PLAYERS
+// DISPLAY PLAYERS
 // ==========================
 
 function renderPlayers(){
 
 
     const list =
-    document.getElementById("playersList");
+    document.getElementById(
+        "playersList"
+    );
+
 
 
     const count =
-    document.getElementById("playerCount");
+    document.getElementById(
+        "playerCount"
+    );
+
+
+
+    if(!list)
+    return;
 
 
 
     list.innerHTML="";
+
 
 
     if(count){
@@ -139,11 +197,18 @@ function renderPlayers(){
 
 
 
-    players.forEach((player)=>{
+
+
+
+    players.forEach(
+    (player,index)=>{
 
 
         const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
 
         div.className =
@@ -158,7 +223,10 @@ function renderPlayers(){
 
         value="${player.name}"
 
-        onchange="editPlayer(${player.id}, this.value)">
+        onchange="editPlayer(${index},this.value)"
+
+        >
+
 
 
         <input
@@ -167,11 +235,15 @@ function renderPlayers(){
 
         value="${player.color}"
 
-        onchange="changeColor(${player.id}, this.value)">
+        onchange="changeColor(${index},this.value)"
+
+        >
 
 
 
-        <button onclick="removePlayer(${player.id})">
+        <button
+
+        onclick="removePlayer(${index})">
 
         Delete
 
@@ -189,6 +261,7 @@ function renderPlayers(){
     });
 
 
+
 }
 
 
@@ -199,23 +272,13 @@ function renderPlayers(){
 
 
 // ==========================
-// EDIT PLAYER NAME
+// EDIT PLAYER
 // ==========================
 
-function editPlayer(id,name){
+function editPlayer(index,value){
 
 
-    let player =
-    players.find(
-        p=>p.id===id
-    );
-
-
-    if(player){
-
-        player.name=name;
-
-    }
+    players[index].name=value;
 
 
 
@@ -239,21 +302,10 @@ function editPlayer(id,name){
 // CHANGE COLOR
 // ==========================
 
-function changeColor(id,color){
+function changeColor(index,color){
 
 
-    let player =
-    players.find(
-        p=>p.id===id
-    );
-
-
-
-    if(player){
-
-        player.color=color;
-
-    }
+    players[index].color=color;
 
 
 
@@ -264,6 +316,7 @@ function changeColor(id,color){
 
 
 }
+
 
 
 
@@ -276,12 +329,12 @@ function changeColor(id,color){
 // REMOVE PLAYER
 // ==========================
 
-function removePlayer(id){
+function removePlayer(index){
 
 
-    players =
-    players.filter(
-        p=>p.id!==id
+    players.splice(
+        index,
+        1
     );
 
 
@@ -294,36 +347,6 @@ function removePlayer(id){
 
 }
 
-
-
-
-
-
-
-
-// ==========================
-// CLEAR ALL PLAYERS
-// ==========================
-
-function clearPlayers(){
-
-
-    if(confirm("Remove all players?")){
-
-
-        players=[];
-
-
-        socket.emit(
-            "updatePlayers",
-            players
-        );
-
-
-    }
-
-
-}
 
 
 
@@ -340,7 +363,7 @@ function startSpin(){
 
 
     console.log(
-        "Spin clicked"
+        "Spin started"
     );
 
 
@@ -358,6 +381,7 @@ function startSpin(){
 
 
 
+
 // ==========================
 // SETTINGS
 // ==========================
@@ -365,50 +389,63 @@ function startSpin(){
 function saveSettings(){
 
 
-settings={
+    settings = {
 
 
-spinDuration:
-Number(
-document.getElementById("spinDuration").value
-),
+        spinDuration:
 
-
-
-minSpeed:
-Number(
-document.getElementById("minSpeed").value
-),
+        Number(
+        document.getElementById(
+            "spinDuration"
+        ).value
+        ),
 
 
 
-maxSpeed:
-Number(
-document.getElementById("maxSpeed").value
-),
+        minSpeed:
+
+        Number(
+        document.getElementById(
+            "minSpeed"
+        ).value
+        ),
 
 
 
-bgColor:
-document.getElementById("bgColor").value
+        maxSpeed:
+
+        Number(
+        document.getElementById(
+            "maxSpeed"
+        ).value
+        ),
 
 
 
-};
+        bgColor:
+
+        document.getElementById(
+            "bgColor"
+        ).value
+
+
+    };
 
 
 
-console.log(
-"Saving settings:",
-settings
-);
+
+
+    socket.emit(
+        "updateSettings",
+        settings
+    );
 
 
 
-socket.emit(
-"updateSettings",
-settings
-);
+    console.log(
+        "Settings sent:",
+        settings
+    );
 
 
 
@@ -425,12 +462,24 @@ settings
 // VIEWERS
 // ==========================
 
-socket.on("viewerCount",(count)=>{
+socket.on(
+"viewerCount",
+(count)=>{
 
 
-document.getElementById(
-"viewerCount"
-).innerText=count;
+    const viewer =
+    document.getElementById(
+        "viewerCount"
+    );
+
+
+
+    if(viewer){
+
+        viewer.innerText=count;
+
+    }
+
 
 
 });

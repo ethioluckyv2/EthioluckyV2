@@ -10,14 +10,33 @@ const app = express();
 
 const server = http.createServer(app);
 
-const io = new Server(server);
+
+
+const io = new Server(server,{
+
+    cors:{
+
+        origin:"*",
+
+        methods:[
+            "GET",
+            "POST"
+        ]
+
+    }
+
+});
 
 
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname,"public")));
 
+app.use(
+    express.static(
+        path.join(__dirname,"public")
+    )
+);
 
 
 
@@ -28,16 +47,24 @@ app.use(express.static(path.join(__dirname,"public")));
 
 const USERS = {
 
+
     admin:{
+
         password:"admin123",
+
         role:"admin"
+
     },
 
 
     host:{
+
         password:"host123",
+
         role:"host"
+
     }
+
 
 };
 
@@ -50,7 +77,9 @@ const USERS = {
 // LOGIN
 // ==========================
 
-app.post("/login",(req,res)=>{
+app.post(
+"/login",
+(req,res)=>{
 
 
     const {
@@ -65,7 +94,10 @@ app.post("/login",(req,res)=>{
 
 
 
-    if(!user || user.password !== password){
+    if(
+        !user ||
+        user.password !== password
+    ){
 
 
         return res.status(401).json({
@@ -102,27 +134,43 @@ app.post("/login",(req,res)=>{
 
 
 // ==========================
-// LOAD DATA
+// DATA FILES
 // ==========================
+
+const dataFolder =
+path.join(
+    __dirname,
+    "data"
+);
+
+
+
+if(!fs.existsSync(dataFolder)){
+
+    fs.mkdirSync(dataFolder);
+
+}
+
 
 
 const playersFile =
 path.join(
-    __dirname,
-    "data/players.json"
+    dataFolder,
+    "players.json"
 );
+
 
 
 const settingsFile =
 path.join(
-    __dirname,
-    "data/settings.json"
+    dataFolder,
+    "settings.json"
 );
 
 
 
 
-// create files if missing
+
 
 if(!fs.existsSync(playersFile)){
 
@@ -134,6 +182,7 @@ if(!fs.existsSync(playersFile)){
 }
 
 
+
 if(!fs.existsSync(settingsFile)){
 
     fs.writeFileSync(
@@ -143,15 +192,21 @@ if(!fs.existsSync(settingsFile)){
         JSON.stringify({
 
             spinDuration:60,
+
             minSpeed:8,
+
             maxSpeed:25,
+
             bgColor:"#ffffff"
+
 
         },null,2)
 
     );
 
 }
+
+
 
 
 
@@ -202,6 +257,7 @@ function savePlayers(){
 
 
 
+
 function saveSettings(){
 
 
@@ -224,13 +280,25 @@ function saveSettings(){
 
 
 
-let viewers = 0;
+
+let viewers=0;
+
+
+
+
+
+
+
+
+
 
 // ==========================
 // SOCKET CONNECTION
 // ==========================
 
-io.on("connection",(socket)=>{
+io.on(
+"connection",
+(socket)=>{
 
 
     console.log(
@@ -243,6 +311,7 @@ io.on("connection",(socket)=>{
     viewers++;
 
 
+
     io.emit(
         "viewerCount",
         viewers
@@ -252,7 +321,8 @@ io.on("connection",(socket)=>{
 
 
 
-    // Send saved data to new connection
+
+    // send current data
 
     socket.emit(
         "updatePlayers",
@@ -272,86 +342,40 @@ io.on("connection",(socket)=>{
 
 
 
-    // ======================
-    // PLAYERS UPDATE
-    // ======================
-
-    socket.on(
-        "updatePlayers",
-        (data)=>{
-
-
-            players = data;
-
-
-
-            savePlayers();
-
-
-
-            console.log(
-                "Players saved:",
-                players
-            );
-
-
-
-            io.emit(
-                "updatePlayers",
-                players
-            );
-
-
-        }
-    );
-
-
-
-
-
-
-
 
 
     // ======================
-    // SETTINGS UPDATE
+    // PLAYERS
     // ======================
 
 
     socket.on(
-        "updateSettings",
-        (data)=>{
+    "updatePlayers",
+    (data)=>{
 
 
-            settings = {
+        players=data;
 
-                ...settings,
 
-                ...data
-
-            };
+        savePlayers();
 
 
 
-            saveSettings();
+        console.log(
+            "Players:",
+            players
+        );
 
 
 
-            console.log(
-                "Settings saved:",
-                settings
-            );
+        io.emit(
+            "updatePlayers",
+            players
+        );
 
 
 
-            io.emit(
-                "updateSettings",
-                settings
-            );
-
-
-        }
-    );
+    });
 
 
 
@@ -362,83 +386,97 @@ io.on("connection",(socket)=>{
 
 
     // ======================
-    // START SPIN
+    // SETTINGS
     // ======================
 
 
     socket.on(
-        "spinWheel",
-        ()=>{
+    "updateSettings",
+    (data)=>{
 
 
-            console.log(
-                "Spin started"
-            );
+        settings={
+
+            ...settings,
+
+            ...data
+
+        };
 
 
 
-            if(players.length === 0){
+        saveSettings();
 
 
-                console.log(
-                    "No players"
-                );
+
+        io.emit(
+            "updateSettings",
+            settings
+        );
 
 
-                return;
+
+    });
+
+
+
+
+
+
+
+
+
+    // ======================
+    // SPIN
+    // ======================
+
+
+    socket.on(
+    "spinWheel",
+    ()=>{
+
+
+        if(players.length===0)
+        return;
+
+
+
+        const winnerIndex =
+
+        Math.floor(
+
+            Math.random()
+            *
+            players.length
+
+        );
+
+
+
+
+
+        io.emit(
+            "spinWheel",
+            {
+
+                winnerIndex,
+
+                duration:
+                settings.spinDuration,
+
+                minSpeed:
+                settings.minSpeed,
+
+                maxSpeed:
+                settings.maxSpeed
+
 
             }
+        );
 
 
 
-
-
-            const winnerIndex =
-
-            Math.floor(
-
-                Math.random()
-                *
-                players.length
-
-            );
-
-
-
-
-
-            io.emit(
-                "spinWheel",
-                {
-
-
-                    winnerIndex:
-                    winnerIndex,
-
-
-
-                    duration:
-                    settings.spinDuration,
-
-
-
-                    minSpeed:
-                    settings.minSpeed,
-
-
-
-                    maxSpeed:
-                    settings.maxSpeed
-
-
-
-                }
-            );
-
-
-
-        }
-    );
+    });
 
 
 
@@ -454,36 +492,32 @@ io.on("connection",(socket)=>{
 
 
     socket.on(
-        "disconnect",
-        ()=>{
+    "disconnect",
+    ()=>{
 
 
-            viewers--;
+        viewers--;
 
 
-            if(viewers < 0){
-
-                viewers = 0;
-
-            }
+        if(viewers<0)
+        viewers=0;
 
 
 
-            io.emit(
-                "viewerCount",
-                viewers
-            );
+        io.emit(
+            "viewerCount",
+            viewers
+        );
 
 
 
-            console.log(
-                "Disconnected:",
-                socket.id
-            );
+        console.log(
+            "Disconnected:",
+            socket.id
+        );
 
 
-        }
-    );
+    });
 
 
 
@@ -500,7 +534,6 @@ io.on("connection",(socket)=>{
 // ==========================
 // START SERVER
 // ==========================
-
 
 const PORT =
 process.env.PORT || 3000;

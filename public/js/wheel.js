@@ -1,9 +1,8 @@
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 
-const socket = io({
-    transports:["websocket"]
-});
+
+const socket = io();
 
 
 let players = [];
@@ -11,6 +10,7 @@ let players = [];
 let rotation = 0;
 
 let spinning = false;
+
 
 
 let settings = {
@@ -28,6 +28,27 @@ let settings = {
 
 
 
+
+// ==========================
+// CONNECTION
+// ==========================
+
+socket.on("connect",()=>{
+
+
+    console.log(
+        "Wheel connected:",
+        socket.id
+    );
+
+
+});
+
+
+
+
+
+
 // ==========================
 // SETTINGS UPDATE
 // ==========================
@@ -37,7 +58,7 @@ socket.on(
 (data)=>{
 
 
-    settings = data;
+    settings=data;
 
 
     document.body.style.backgroundColor =
@@ -45,6 +66,7 @@ socket.on(
 
 
 });
+
 
 
 
@@ -60,13 +82,14 @@ socket.on(
 (data)=>{
 
 
-    players = data;
+    players=data;
 
 
     drawWheel();
 
 
 });
+
 
 
 
@@ -95,7 +118,7 @@ function drawWheel(){
 
         ctx.font="30px Arial";
 
-        ctx.fillStyle="black";
+        ctx.fillStyle="#000";
 
 
         ctx.fillText(
@@ -112,17 +135,20 @@ function drawWheel(){
 
 
 
+
     const center =
-    canvas.width / 2;
+    canvas.width/2;
+
 
 
     const radius =
-    canvas.width / 2 - 15;
+    canvas.width/2-15;
 
 
 
     const slice =
-    (Math.PI * 2) / players.length;
+    (Math.PI*2)/players.length;
+
 
 
 
@@ -133,11 +159,12 @@ function drawWheel(){
 
 
         const start =
-        index * slice;
+        index*slice;
 
 
         const end =
-        start + slice;
+        start+slice;
+
 
 
 
@@ -169,11 +196,12 @@ function drawWheel(){
         player.color || "#ddd";
 
 
+
         ctx.fill();
 
 
 
-        ctx.strokeStyle="#ffffff";
+        ctx.strokeStyle="#fff";
 
         ctx.lineWidth=3;
 
@@ -183,7 +211,10 @@ function drawWheel(){
 
 
 
-        // PLAYER TEXT
+
+
+        // TEXT
+
 
         ctx.save();
 
@@ -272,7 +303,7 @@ socket.on(
 
 
 // ==========================
-// REALISTIC SPIN
+// SPIN FUNCTION
 // ==========================
 
 function spinWheel(
@@ -300,24 +331,25 @@ maxSpeed
 
 
 
-    const slice =
+
+    const segment =
     360 / players.length;
 
 
 
 
-    // CENTER OF WINNING SEGMENT
 
     const winnerAngle =
-    winnerIndex * slice + slice/2;
+    winnerIndex * segment
+    +
+    segment/2;
 
 
 
 
 
-    // Make many rotations
 
-    const extraRotations =
+    const rotations =
     Math.max(
         8,
         maxSpeed
@@ -328,23 +360,18 @@ maxSpeed
 
 
 
-    /*
-       Pointer is at the top.
-       270 degrees = top position.
-    */
-
-
     const finalRotation =
 
     rotation
 
     +
 
-    (extraRotations * 360)
+    rotations*360
 
     +
 
-    (270 - winnerAngle);
+    (270-winnerAngle);
+
 
 
 
@@ -358,10 +385,13 @@ maxSpeed
 
 
 
-    // Use full duration
 
-    const spinTime =
-    duration || settings.spinDuration;
+
+    const time =
+
+    duration ||
+    settings.spinDuration;
+
 
 
 
@@ -370,7 +400,8 @@ maxSpeed
 
     canvas.style.transition =
 
-    `transform ${spinTime}s cubic-bezier(.12,.85,.18,1)`;
+    `transform ${time}s cubic-bezier(.12,.85,.18,1)`;
+
 
 
 
@@ -387,12 +418,10 @@ maxSpeed
 
 
 
-
     setTimeout(()=>{
 
 
         spinning=false;
-
 
 
         showWinner(
@@ -400,8 +429,7 @@ maxSpeed
         );
 
 
-
-    },spinTime*1000);
+    },time*1000);
 
 
 
@@ -416,7 +444,7 @@ maxSpeed
 
 
 // ==========================
-// WINNER
+// WINNER DISPLAY
 // ==========================
 
 function showWinner(player){
@@ -427,8 +455,11 @@ function showWinner(player){
 
 
 
+
     const box =
-    document.getElementById("winner");
+    document.getElementById(
+        "winner"
+    );
 
 
 
@@ -453,12 +484,18 @@ function showWinner(player){
 
 
 
-        celebrateWinner(
-            player.name
-        );
+        if(typeof celebrateWinner==="function"){
+
+            celebrateWinner(
+                player.name
+            );
+
+        }
+
 
 
     }
+
 
 
 }

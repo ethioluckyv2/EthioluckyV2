@@ -1,0 +1,282 @@
+/* ==========================
+   ETHIOLUCKY V2 ADMIN STYLE
+========================== */
+
+
+body {
+
+    background:#f5f5f5;
+
+}
+
+
+
+
+
+/* Main admin cards */
+
+
+.card {
+
+
+    background:white;
+
+
+    border-radius:25px;
+
+
+    padding:30px;
+
+
+    margin:20px;
+
+
+    width:min(800px,95%);
+
+
+    box-shadow:
+
+    0 15px 40px rgba(0,0,0,0.12);
+
+
+}
+
+
+
+
+
+
+.card h2 {
+
+
+    font-size:28px;
+
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+
+
+
+/* Player area */
+
+
+#playersList {
+
+
+    margin-top:20px;
+
+
+    display:flex;
+
+
+    flex-direction:column;
+
+
+    gap:12px;
+
+
+}
+
+
+
+
+
+#playersList div {
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:space-between;
+
+
+    background:#fafafa;
+
+
+    padding:15px;
+
+
+    border-radius:15px;
+
+
+    box-shadow:
+
+    0 5px 15px rgba(0,0,0,0.08);
+
+
+}
+
+
+
+
+
+
+
+#playersList input[type="color"] {
+
+
+    width:45px;
+
+
+    height:35px;
+
+
+}
+
+
+
+
+
+
+
+/* Settings */
+
+
+label {
+
+
+    display:block;
+
+
+    font-weight:bold;
+
+
+    margin-top:15px;
+
+
+}
+
+
+
+
+
+
+input[type="number"] {
+
+
+    width:200px;
+
+
+}
+
+
+
+
+
+
+
+
+/* Spin button */
+
+
+.spinButton {
+
+
+    width:100%;
+
+
+    background:
+
+    linear-gradient(
+        135deg,
+        #ff9800,
+        #ff5722
+    );
+
+
+    font-size:24px;
+
+
+    font-weight:bold;
+
+
+    padding:20px;
+
+
+    border-radius:20px;
+
+
+    box-shadow:
+
+    0 10px 25px rgba(255,100,0,0.35);
+
+
+}
+
+
+
+
+
+
+.spinButton:hover {
+
+
+    transform:scale(1.03);
+
+
+}
+
+
+
+
+
+
+
+
+/* Viewer count */
+
+
+#viewerCount {
+
+
+    color:#009688;
+
+
+    font-size:35px;
+
+
+}
+
+
+
+
+
+
+
+
+/* Mobile */
+
+
+@media(max-width:700px){
+
+
+.card {
+
+
+padding:20px;
+
+
+margin:10px;
+
+
+}
+
+
+input[type="number"]{
+
+
+width:100%;
+
+
+}
+
+
+}

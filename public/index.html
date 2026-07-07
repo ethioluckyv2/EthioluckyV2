@@ -1,45 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>EthioluckyV2</title>
-  <link rel="stylesheet" href="style.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ethiolucky</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/viewer.css">
+
 </head>
+
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="login" class="center">
-  <div class="card">
-    <h2>🎡 EthioluckyV2</h2>
+<div class="page">
 
-    <input id="role" placeholder="admin or host">
-    <input id="password" type="password" placeholder="password">
+    <h1 class="logo">
+        🎡 Ethiolucky
+    </h1>
 
-    <button onclick="login()">Login</button>
-  </div>
-</div>
+    <div id="wheelContainer">
 
-<!-- MAIN APP -->
-<div id="app" style="display:none;">
+        <div id="pointer"></div>
 
-  <div class="topbar">
-    <h2>🎡 Live Wheel</h2>
-    <p>👁 Viewers: <span id="viewers">0</span></p>
-  </div>
+        <canvas
+            id="wheel"
+            width="700"
+            height="700">
+        </canvas>
 
-  <div class="wheel-container">
-    <canvas id="wheel" width="400" height="400"></canvas>
-  </div>
+    </div>
 
-  <div class="controls">
-    <button onclick="spin()">SPIN</button>
-  </div>
-
-  <h1 id="winner"></h1>
+    <div id="winner">
+        Waiting for next spin...
+    </div>
 
 </div>
+
+<audio 
+id="winnerSound"
+src="sounds/winner.mp3">
+</audio>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="wheel.js"></script>
+
+<script src="js/celebration.js"></script>
+
+<script src="js/wheel.js"></script>
 
 </body>
+
 </html>
